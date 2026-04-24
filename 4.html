@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vintage Korean Aesthetic Phone</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@400;700&family=Noto+Sans+KR:wght@300;400;500;700&family=Roboto:wght@300;400&display=swap');
+
+        :root {
+            --bg-pink: #F2E4E9;
+            --gray-light: #BFBBBE;
+            --gray-med: #A0A0A3;
+            --gray-dark: #5F5F60;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+
+        body {
+            display: flex; justify-content: center; align-items: center;
+            height: 100vh; background-color: #e0d8db;
+            font-family: 'Roboto', 'Noto Sans KR', sans-serif;
+        }
+
+        /* 手机基础框架 */
+        .phone {
+            width: 320px; height: 680px;
+            background-color: var(--bg-pink); border-radius: 40px;
+            box-shadow: 0 20px 50px rgba(95, 95, 96, 0.2);
+            position: relative; overflow: hidden;
+            border: 8px solid var(--gray-light);
+        }
+
+        .notch {
+            position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+            width: 110px; height: 25px; background-color: var(--gray-light);
+            border-bottom-left-radius: 15px; border-bottom-right-radius: 15px; z-index: 100;
+        }
+
+        .status-bar {
+            position: absolute; top: 0; left: 0; width: 100%; height: 35px;
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0 22px; font-size: 11px; font-weight: 500;
+            color: var(--gray-dark); z-index: 101; pointer-events: none;
+        }
+        .status-left, .status-right { display: flex; align-items: center; gap: 6px; }
+        .status-time { opacity: 0; transition: opacity 0.3s; }
+        .phone.is-unlocked .status-time { opacity: 1; }
+        .signal { display: flex; align-items: flex-end; gap: 1.5px; height: 9px; }
+        .signal span { width: 2px; background-color: var(--gray-dark); border-radius: 1px; }
+        .signal span:nth-child(1) { height: 4px; }
+        .signal span:nth-child(2) { height: 5.5px; }
+        .signal span:nth-child(3) { height: 7px; }
+        .signal span:nth-child(4) { height: 9px; }
+        .network-type { font-size: 10px; font-weight: bold; margin-right: 2px; }
+        .battery {
+            width: 18px; height: 9px; border: 1px solid var(--gray-dark);
+            border-radius: 2px; position: relative; padding: 1px;
+        }
+        .battery::after {
+            content: ''; position: absolute; right: -3px; top: 2px;
+            width: 2px; height: 3px; background-color: var(--gray-dark); border-radius: 0 1px 1px 0;
+        }
+        .battery-level { width: 75%; height: 100%; background-color: var(--gray-dark); border-radius: 1px; }
+
+        /* 锁屏 */
+        .lock-screen {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            display: flex; flex-direction: column; align-items: center;
+            padding-top: 120px; background-color: var(--bg-pink);
+            z-index: 50; transition: transform 0.6s cubic-bezier(0.8, 0, 0.2, 1);
+        }
+        .lock-screen.unlocked { transform: translateY(-100%); }
+        .time { font-size: 64px; font-weight: 300; color: var(--gray-dark); letter-spacing: 2px; }
+        .date { font-size: 13px; color: var(--gray-med); margin-top: 10px; font-family: 'Nanum Myeongjo', serif; }
+
+        .swipe-hint {
+            position: absolute; bottom: 40px; display: flex; flex-direction: column;
+            align-items: center; color: var(--gray-med); font-size: 12px;
+            letter-spacing: 2px; animation: bounce 2s infinite;
+        }
+        .swipe-hint::before {
+            content: ''; display: block; width: 8px; height: 8px;
+            border-top: 1.5px solid var(--gray-med); border-right: 1.5px solid var(--gray-med);
+            transform: rotate(-45deg); margin-bottom: 8px;
+        }
+        @keyframes bounce { 0%, 20%, 50%, 80%, 100% { transform: translateY(0); } 40% { transform: translateY(-10px); } 60% { transform: translateY(-5px); } }
+
+        /* 主屏 */
+        .home-screen {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            padding: 80px 30px; background-color: var(--bg-pink);
+            display: grid; grid-template-columns: repeat(3, 1fr); grid-auto-rows: 90px;
+            gap: 20px 15px; z-index: 5;
+        }
+        .app { display: flex; flex-direction: column; align-items: center; cursor: pointer; opacity: 0; transform: translateY(10px); transition: all 0.4s ease; }
+        .phone.is-unlocked .app { opacity: 1; transform: translateY(0); }
+        .app-name { font-size: 11px; color: var(--gray-dark); margin-top: 8px; }
+
+        .icon {
+            width: 50px; height: 50px; background-color: var(--bg-pink);
+            border: 1px solid var(--gray-light); border-radius: 14px;
+            display: flex; justify-content: center; align-items: center; position: relative;
+            box-shadow: inset 2px 2px 5px rgba(255,255,255,0.5), inset -2px -2px 5px rgba(160, 160, 163, 0.1);
+        }
+        .icon.log::after { content: ''; width: 20px; height: 24px; border: 1.5px solid var(--gray-dark); border-radius: 2px; border-left: 4px solid var(--gray-med); }
+        .icon.music::after { content: ''; width: 24px; height: 24px; border: 1.5px solid var(--gray-dark); border-radius: 50%; background: radial-gradient(circle, var(--gray-med) 3px, transparent 4px); }
+        .icon.memo::after { content: ''; width: 20px; height: 20px; border-bottom: 1.5px solid var(--gray-dark); border-top: 1.5px solid var(--gray-dark); background: repeating-linear-gradient(to bottom, transparent, transparent 6px, var(--gray-light) 6px, var(--gray-light) 7px); }
+        .icon.focus::after { content: ''; width: 22px; height: 22px; border: 1.5px dashed var(--gray-dark); border-radius: 50%; }
+        .icon.focus::before { content: ''; position: absolute; width: 2px; height: 8px; background-color: var(--gray-med); transform: translateY(-2px); }
+        .icon.talk::after { content: ''; width: 24px; height: 18px; border: 1.5px solid var(--gray-dark); border-radius: 8px; }
+        .icon.talk::before { content: ''; position: absolute; bottom: 12px; right: 14px; width: 6px; height: 6px; border-bottom: 1.5px solid var(--gray-dark); border-right: 1.5px solid var(--gray-dark); transform: rotate(45deg); }
+        .icon.voca { font-family: 'Nanum Myeongjo', serif; color: var(--gray-dark); font-size: 18px; font-weight: bold; }
+        .icon.voca::after { content: '가'; }
+        .icon.setting::after { content: ''; width: 18px; height: 18px; border: 3px dotted var(--gray-dark); border-radius: 50%; }
+        .icon.setting::before { content: ''; position: absolute; width: 8px; height: 8px; border: 1.5px solid var(--gray-dark); border-radius: 50%; }
+
+        /* ======== 阅读 APP 界面 (기록) ======== */
+        .inner-app {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: #FAF5F7; z-index: 20;
+            transform: translateX(100%); transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+            display: flex; flex-direction: column;
+        }
+        .inner-app.active { transform: translateX(0); }
+
+        .app-header {
+            padding: 45px 20px 15px 20px; display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 1px solid var(--gray-light); color: var(--gray-dark); font-size: 14px; font-weight: 500;
+            background: rgba(250, 245, 247, 0.9); backdrop-filter: blur(5px); z-index: 2;
+        }
+        .back-btn { font-size: 18px; cursor: pointer; font-weight: 300; }
+        
+        .app-content { flex: 1; overflow-y: auto; padding: 20px; padding-bottom: 80px;}
+        .app-content::-webkit-scrollbar { display: none; }
+
+        /* 统计数据区 */
+        .stats-nav { display: flex; font-size: 12px; gap: 15px; margin-bottom: 20px; color: var(--gray-med); cursor: pointer; }
+        .stats-nav span.active { color: var(--gray-dark); font-weight: bold; border-bottom: 1.5px solid var(--gray-dark); padding-bottom: 2px;}
+        
+        .stats-card {
+            background-color: white; border-radius: 16px; padding: 15px;
+            box-shadow: 0 4px 15px rgba(160, 160, 163, 0.1); margin-bottom: 25px;
+            border: 1px solid rgba(191, 187, 190, 0.3);
+        }
+        .stat-row { display: flex; justify-content: space-between; margin-bottom: 10px; align-items: baseline;}
+        .stat-label { font-size: 11px; color: var(--gray-med); }
+        .stat-val { font-size: 16px; font-weight: 700; color: var(--gray-dark); transition: all 0.3s;}
+        
+        .progress-bar-container { width: 100%; height: 4px; background-color: var(--gray-light); border-radius: 2px; margin-top: 5px; overflow: hidden; }
+        .progress-bar { height: 100%; background-color: var(--gray-dark); border-radius: 2px; width: 0%; transition: width 0.5s ease; }
+
+        /* 书架区 */
+        .section-title { font-size: 13px; font-weight: 700; color: var(--gray-dark); margin-bottom: 15px; font-family: 'Nanum Myeongjo', serif;}
+        .bookshelf { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; }
+        .empty-state { grid-column: span 3; text-align: center; font-size: 11px; color: var(--gray-med); margin-top: 20px; }
+        
+        .book { display: flex; flex-direction: column; align-items: center; cursor: pointer; transition: transform 0.2s;}
+        .book:active { transform: scale(0.95); }
+        .book-cover {
+            width: 70px; height: 100px; border-radius: 4px 8px 8px 4px;
+            display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 8px;
+            box-shadow: 3px 0 5px rgba(0,0,0,0.05), inset 2px 0 2px rgba(255,255,255,0.3);
+            text-align: center; position: relative;
+            background-color: var(--gray-light); color: white;
+        }
+        .book-title { font-size: 9px; font-weight: 700; font-family: 'Nanum Myeongjo', serif; line-height: 1.2; word-break: break-all;}
+        .book-ext { position: absolute; bottom: 5px; right: 5px; font-size: 7px; opacity: 0.5; text-transform: uppercase; font-family: 'Roboto', sans-serif;}
+
+        /* 导入按钮 */
+        .fab-import {
+            position: absolute; bottom: 30px; right: 20px;
+            width: 45px; height: 45px; background-color: var(--gray-dark); color: white;
+            border-radius: 50%; display: flex; justify-content: center; align-items: center;
+            font-size: 20px; box-shadow: 0 4px 10px rgba(95, 95, 96, 0.4); cursor: pointer; z-index: 30;
+        }
+        input[type="file"] { display: none; }
+
+        /* ======== 内部阅读器界面 (Reader View) ======== */
+        .reader-view {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: #FAF5F7; z-index: 40;
+            transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+            display: flex; flex-direction: column;
+        }
+        .reader-view.active { transform: translateY(0); }
+        
+        .reader-content {
+            flex: 1; overflow-y: auto; padding: 20px; padding-bottom: 50px;
+            font-family: 'Nanum Myeongjo', serif; font-size: 13px; line-height: 2;
+            color: var(--gray-dark); text-align: justify; word-break: break-word; white-space: pre-wrap;
+        }
+        .reader-content::-webkit-scrollbar { display: none; }
+        
+        /* 阅读时悬浮的实时计时器 */
+        .live-stats {
+            position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
+            background: rgba(95, 95, 96, 0.8); color: white; padding: 5px 15px;
+            border-radius: 20px; font-size: 10px; backdrop-filter: blur(5px);
+            display: flex; gap: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="phone" id="phoneBox">
+        <div class="notch"></div>
+        <div class="status-bar">
+            <div class="status-left"><span class="status-time" id="statusBarTime">00:00</span></div>
+            <div class="status-right">
+                <div class="network-type">5G</div>
+                <div class="signal"><span></span><span></span><span></span><span></span></div>
+                <div class="battery"><div class="battery-level"></div></div>
+            </div>
+        </div>
+
+        <!-- 内部阅读 APP 界面 (기록) -->
+        <div class="inner-app" id="readApp">
+            <div class="app-header">
+                <div class="back-btn" onclick="closeApp()">←</div>
+                <div>기록 (Log)</div>
+                <div style="width: 18px;"></div>
+            </div>
+            
+            <div class="app-content">
+                <!-- 统计目标区 -->
+                <div class="stats-nav" id="statsNav">
+                    <span class="active" onclick="switchStats('day')">일 (日)</span>
+                    <span onclick="switchStats('week')">주 (周)</span>
+                    <span onclick="switchStats('month')">월 (月)</span>
+                    <span onclick="switchStats('year')">년 (年)</span>
+                </div>
+                
+                <div class="stats-card">
+                    <div class="stat-row">
+                        <span class="stat-label">阅读时长</span>
+                        <span class="stat-val" id="statTime">0분</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">阅读字数</span>
+                        <span class="stat-val" id="statWords">0 자</span>
+                    </div>
+                    <div class="stat-row" style="margin-top: 15px;">
+                        <span class="stat-label">目标达成率</span>
+                        <span class="stat-val" id="statGoal" style="font-size: 13px;">0%</span>
+                    </div>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar" id="statProgress" style="width: 0%;"></div>
+                    </div>
+                </div>
+
+                <!-- 书架区 -->
+                <div class="section-title">내 서재 (我的书架)</div>
+                <div class="bookshelf" id="bookshelf">
+                    <div class="empty-state" id="emptyState">책장이 비어 있습니다.<br>+ 버튼을 눌러 책을 추가하세요.</div>
+                </div>
+            </div>
+
+            <label class="fab-import" for="fileInput">+</label>
+            <input type="file" id="fileInput" accept=".pdf,.html,.mobi,.epub,.azw3,.docx,.txt" onchange="importBook(event)">
+        </div>
+
+        <!-- 真正的阅读器界面 (全屏覆盖) -->
+        <div class="reader-view" id="readerView">
+            <div class="app-header">
+                <div class="back-btn" onclick="closeBook()">↓</div>
+                <div id="readerTitle" style="font-size: 12px; font-weight: 700;">책 제목</div>
+                <div style="width: 18px;"></div>
+            </div>
+            <div class="reader-content" id="readerContent"></div>
+            <div class="live-stats">
+                <span id="liveTime">00:00</span>
+                <span id="liveWords">0 자</span>
+            </div>
+        </div>
+
+        <!-- 主界面 -->
+        <div class="home-screen">
+            <div class="app" onclick="openApp()"><div class="icon log"></div><div class="app-name">기록</div></div>
+            <div class="app"><div class="icon music"></div><div class="app-name">음악</div></div>
+            <div class="app"><div class="icon memo"></div><div class="app-name">메모</div></div>
+            <div class="app"><div class="icon focus"></div><div class="app-name">집중</div></div>
+            <div class="app"><div class="icon talk"></div><div class="app-name">톡</div></div>
+            <div class="app"><div class="icon voca"></div><div class="app-name">단어</div></div>
+            <div class="app"><div class="icon setting"></div><div class="app-name">설정</div></div>
+        </div>
+
+        <!-- 锁屏 -->
+        <div class="lock-screen" id="lockScreen">
+            <div class="time" id="timeDisplay">00:00</div>
+            <div class="date" id="dateDisplay">1월 1일 월요일</div>
+            <div class="swipe-hint">swipe up</div>
+        </div>
+    </div>
+
+    <script>
+        /* ==== 基础：时间与解锁 ==== */
+        function updateTime() {
+            const now = new Date();
+            let hours = now.getHours().toString().padStart(2, '0');
+            let minutes = now.getMinutes().toString().padStart(2, '0');
+            document.getElementById('timeDisplay').innerText = `${hours}:${minutes}`;
+            document.getElementById('statusBarTime').innerText = `${hours}:${minutes}`;
+            const weekDays = ['일', '월', '화', '수', '목', '금', '토'];
+            document.getElementById('dateDisplay').innerText = `${now.getMonth() + 1}월 ${now.getDate()}일 ${weekDays[now.getDay()]}요일`;
+        }
+        setInterval(updateTime, 1000); updateTime();
+
+        const lockScreen = document.getElementById('lockScreen'), phoneBox = document.getElementById('phoneBox');
+        let startY = 0, isDragging = false;
+        lockScreen.addEventListener('touchstart', e => startY = e.touches[0].clientY);
+        lockScreen.addEventListener('touchend', e => { if (startY - e.changedTouches[0].clientY > 50) unlockPhone(); });
+        lockScreen.addEventListener('mousedown', e => { startY = e.clientY; isDragging = true; });
+        window.addEventListener('mouseup', e => { if (isDragging && startY - e.clientY > 50) unlockPhone(); isDragging = false; });
+        function unlockPhone() { lockScreen.classList.add('unlocked'); phoneBox.classList.add('is-unlocked'); }
+        document.querySelector('.home-screen').addEventListener('dblclick', (e) => {
+            if(e.target === document.querySelector('.home-screen')) {
+                lockScreen.classList.remove('unlocked'); phoneBox.classList.remove('is-unlocked');
+            }
+        });
+
+        /* ==== 核心：动态阅读数据模拟 ==== */
+        const readApp = document.getElementById('readApp');
+        function openApp() { readApp.classList.add('active'); updateStatsUI(); }
+        function closeApp() { readApp.classList.remove('active'); }
+
+        // 数据中枢（单位：秒 / 字）
+        // 初始给一点历史数据，让周/月/年看起来真实
+        let readingData = {
+            day: { time: 0, words: 0, goalTime: 3600 },        // 目标1小时
+            week: { time: 18000, words: 24000, goalTime: 25200 }, // 历史5小时
+            month: { time: 72000, words: 95000, goalTime: 108000 },
+            year: { time: 360000, words: 500000, goalTime: 1200000 }
+        };
+        let currentTab = 'day';
+        let isReading = false;
+        let readTimer = null;
+        let sessionTime = 0; // 单次阅读秒数
+        let sessionWords = 0; // 单次阅读字数
+
+        function formatTime(seconds) {
+            let h = Math.floor(seconds / 3600);
+            let m = Math.floor((seconds % 3600) / 60);
+            if (h > 0) return `${h}시간 ${m}분`;
+            return `${m}분`;
+        }
+
+        function formatWords(words) {
+            return words.toLocaleString() + ' 자';
+        }
+
+        // 切换统计Tab
+        function switchStats(period) {
+            currentTab = period;
+            document.querySelectorAll('#statsNav span').forEach(el => el.classList.remove('active'));
+            document.querySelector(`#statsNav span[onclick="switchStats('${period}')"]`).classList.add('active');
+            updateStatsUI();
+        }
+
+        // 更新仪表盘UI
+        function updateStatsUI() {
+            let totalTime = readingData[currentTab].time + (currentTab === 'day' ? sessionTime : sessionTime);
+            let totalWords = readingData[currentTab].words + sessionWords;
+            let percent = Math.min(100, Math.floor((totalTime / readingData[currentTab].goalTime) * 100));
+
+            document.getElementById('statTime').innerText = formatTime(totalTime);
+            document.getElementById('statWords').innerText = formatWords(totalWords);
+            document.getElementById('statGoal').innerText = percent + '%';
+            document.getElementById('statProgress').style.width = percent + '%';
+        }
+
+        /* ==== 书籍导入与阅读逻辑 ==== */
+        let booksArray = []; // 存储所有书籍内容
+
+        function importBook(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const fullName = file.name;
+            const lastDotIndex = fullName.lastIndexOf('.');
+            let title = lastDotIndex !== -1 ? fullName.substring(0, lastDotIndex) : fullName;
+            let ext = lastDotIndex !== -1 ? fullName.substring(lastDotIndex + 1).toLowerCase() : "file";
+            if(title.length > 8) title = title.substring(0, 8) + '...';
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                let textContent = "";
+                if(ext === 'txt') {
+                    textContent = e.target.result;
+                } else {
+                    // 模拟解析复杂文件，显示优美的韩文占位符
+                    textContent = `(이 파일은 ${ext.toUpperCase()} 형식입니다. 브라우저 시뮬레이터에서는 원본 텍스트를 파싱할 수 없어, 더미 텍스트로 대체됩니다.)\n\n바람이 불어오는 곳으로\n우리가 가야 할 곳은 어디일까.\n\n시간은 조용히 흐르고,\n창밖의 풍경은 어제와 다름없지만,\n내 마음속 작은 일렁임은\n새로운 계절을 알리고 있었다.\n\n수많은 글자들 속에서\n나는 잠시 길을 잃기도 하고,\n때로는 잊혀진 기억의 한 조각을\n조심스레 꺼내어 보기도 한다.\n\n이 작은 화면 너머로 펼쳐지는 세상이\n나에게 작은 위로가 되기를.`;
+                }
+
+                // 保存到数组
+                const bookId = booksArray.length;
+                booksArray.push({ title: title, content: textContent });
+
+                // 移除空状态
+                const emptyState = document.getElementById('emptyState');
+                if (emptyState) emptyState.remove();
+
+                // 生成 UI
+                const newBookHtml = `
+                    <div class="book" onclick="openBook(${bookId})">
+                        <div class="book-cover">
+                            <span class="book-title">${title}</span>
+                            <span class="book-ext">${ext}</span>
+                        </div>
+                    </div>
+                `;
+                document.getElementById('bookshelf').insertAdjacentHTML('afterbegin', newBookHtml);
+            };
+
+            // 读取文件
+            if(ext === 'txt') {
+                reader.readAsText(file);
+            } else {
+                // 对于非txt文件，直接触发onload模拟
+                reader.onload({target: {result: ""}});
+            }
+            event.target.value = ''; // 清空input
+        }
+
+        // 打开书籍阅读
+        const readerView = document.getElementById('readerView');
+        
+        function openBook(id) {
+            document.getElementById('readerTitle').innerText = booksArray[id].title;
+            document.getElementById('readerContent').innerText = booksArray[id].content;
+            readerView.classList.add('active');
+            
+            // 开始实时统计阅读
+            isReading = true;
+            sessionTime = 0;
+            sessionWords = 0;
+            updateLiveTags();
+
+            readTimer = setInterval(() => {
+                sessionTime++;
+                // 模拟平均每秒阅读 3-5 个字
+                sessionWords += Math.floor(Math.random() * 3) + 3;
+                updateLiveTags();
+            }, 1000);
+        }
+
+        // 退出阅读
+        function closeBook() {
+            readerView.classList.remove('active');
+            isReading = false;
+            clearInterval(readTimer);
+
+            // 将本次阅读数据持久化加入总数据中
+            Object.keys(readingData).forEach(key => {
+                readingData[key].time += sessionTime;
+                readingData[key].words += sessionWords;
+            });
+            sessionTime = 0;
+            sessionWords = 0;
+
+            // 刷新后台的统计界面
+            updateStatsUI();
+        }
+
+        // 更新阅读器底部悬浮的时间/字数
+        function updateLiveTags() {
+            let m = Math.floor(sessionTime / 60).toString().padStart(2, '0');
+            let s = (sessionTime % 60).toString().padStart(2, '0');
+            document.getElementById('liveTime').innerText = `${m}:${s}`;
+            document.getElementById('liveWords').innerText = `${sessionWords} 자`;
+        }
+
+    </script>
+</body>
+</html>
